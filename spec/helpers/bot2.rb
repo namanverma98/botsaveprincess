@@ -1,50 +1,67 @@
-# 5
-# 3 2    2 3
-# -----
-# -----
-# p--m-
-# -----
-# -----
+# frozen_string_literal: true
 
+require 'rails_helper'
 
-def nextMove(n,c,r,p,grid)
-  case
-  when p[0] - r < 0 then move = "UP"
-  when p[0] - r > 0 then move = "DOWN"
-  when p[1] - c < 0 then move = "LEFT"
-  when p[1] - c > 0 then move = "RIGHT"
-  end
-  move
-end
-
-if defined? _input
-  lines = _input.strip.split("\n")
-  n = lines[0].to_i
-  x,y = lines[1].strip.split.map {|n| n.to_i}
-  grid = lines[2..-1]
-  princess = nil
-  grid.each_with_index do |r, i|
-    if r.include? 'p'
-      princess = [i, r.strip.index('p')]
-      break
+class Bot2
+  def next_move(length, column, roo, princess)
+    case
+    when princess[0] - roo < 0 then move = 'UP'
+    when princess[0] - roo > 0 then move = 'DOWN'
+    when princess[1] - column < 0 then move = 'LEFT'
+    when princess[1] - column > 0 then move = 'RIGHT'
     end
+    move
   end
-else
-  # Tail starts here
-  n = gets.to_i
 
-  x,y = gets.strip.split.map {|num| num.to_i}
-
-  grid = Array.new(n)
-
-  princess = nil
-  (0...n).each do |i|
-    row = gets
-    if row.include? 'p'
-      princess = [i, row.index('p')]
+  def first_move(length, column, roo, grid)
+    unless length >= 3 && length < 100
+      return 'Grid size should be greater than 2.'
     end
-    grid[i] = row
+    status = true
+    grid.each do |g|
+      if g.length != length
+        status = false
+      end
+    end
+    unless grid.length == length && status
+      return 'Invalid paramters provided.'
+    end
+    princess = nil
+    (0...length).each do |i|
+      row = grid[i]
+      if row.include? 'p'
+        princess = [i, row.index('p')]
+      end
+    end
+    next_move(length, column, roo, princess)
   end
 end
 
-puts nextMove(n,x,y,princess,grid)
+
+describe 'Bot2' do
+  it 'bot_donot_save_princess' do
+    res = Bot2.new.first_move(2, 1, 1, ['---', '-m-', '--p'])
+    expect(res).not_to eq('DOWN')
+  end
+
+  it 'bot_save_princess' do
+    res = Bot2.new.first_move(3, 1, 1, ['---', '-m-', '--p'])
+    expect(res).to eq('DOWN')
+  end
+
+  it 'bot_donot_save_princess' do
+    res = Bot2.new.first_move(3, 1, 1, ['----', '-m-', '--p'])
+    expect(res).not_to eq('DOWN')
+  end
+
+  it 'bot_save_princess' do
+    res = Bot2.new.first_move(5, 4, 2, ['----p', '-----', '-----', '-----', '--m--'])
+    expect(res).to eq('UP')
+  end
+
+  it 'bot_donot_save_princess' do
+    res = Bot2.new.first_move(6, 4, 2, ['----p', '-----', '-----', '-----', '--m--'])
+    expect(res).not_to eq('UP')
+  end
+
+end

@@ -23,5 +23,5 @@ Things you may want to cover:
 
   To run rspec run this command - 
   bundle exec rspec spec/helpers/bot.rb
-
+  bundle exec rspec spec/helpers/bot2.rb
 * ...
